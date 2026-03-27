@@ -1,0 +1,47 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: kubectl-nettrace
+    binary: kubectl-nettrace
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+
+archives:
+  - id: kubectl-nettrace
+    formats: [tar.gz]
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    name_template: "kubectl-nettrace_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
+
+krews:
+  - name: nettrace
+    repository:
+      owner: vinayus
+      name: krew-index
+      branch: "nettrace-{{ .Version }}"
+      pull_request:
+        enabled: true
+        base:
+          owner: kubernetes-sigs
+          name: krew-index
+          branch: master
+    homepage: https://github.com/vinayus/kubectl-nettrace
+    description: Traces the network path between two Kubernetes workloads hop by hop. Shows source health, NetworkPolicy evaluation, Service routing, EndpointSlice health, DNS requirements, and Gateway API routes.
+    short_description: Hop-by-hop network path tracer between Kubernetes workloads.
+    skip_upload: false
